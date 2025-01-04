@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Produk</title>
+    <title>Insert Produk</title>
     <style>
         * {
             margin: 0;
@@ -47,25 +47,36 @@
             transition: 0.3s;
         }
 
+        img {
+    max-width: 100px;
+    max-height: 100px;
+}
+
         /* Main content styling */
         .main-content {
             flex: 1;
             padding: 40px;
         }
 
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
         h1 {
-            margin-bottom: 20px;
+            text-align: center;
             color: #333;
+            margin-bottom: 20px;
         }
 
         form {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-gap: 20px;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            grid-template-columns: 1fr;
+            grid-gap: 15px;
         }
 
         label {
@@ -81,10 +92,16 @@
             font-size: 14px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus {
+            border-color: #007bff;
         }
 
         textarea {
-            grid-column: span 2;
             resize: vertical;
             min-height: 100px;
         }
@@ -97,7 +114,6 @@
             border-radius: 4px;
             font-size: 16px;
             cursor: pointer;
-            grid-column: span 2;
             transition: background-color 0.3s ease;
         }
 
@@ -105,33 +121,15 @@
             background-color: #0056b3;
         }
 
-        /* Table style if needed in main content */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
 
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-
-        img {
-            max-width: 100px;
-            max-height: 100px;
-        }
-
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
+            .main-content {
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -150,40 +148,42 @@
 
     <!-- Main content section -->
     <div class="main-content">
-        <h1>Edit Produk</h1>
-        <form action="/admin/edit/<%= product.id_product %>" method="POST">
-            <div class="form-group">
-                <label for="nama_product">Nama Produk:</label>
-                <input type="text" name="nama_product" value="<%= product.nama_product %>" required>
-            </div>
+        <div class="container">
+            <h1>Tambah Produk Baru</h1>
+            <form action="/admin/insert" method="POST">
+                <div class="form-group">
+                    <label for="nama_product">Nama Produk:</label>
+                    <input type="text" name="nama_product" placeholder="Nama produk" required>
+                </div>
 
-            <div class="form-group">
-                <label for="gambar">URL Gambar:</label>
-                <input type="text" name="gambar" value="<%= product.gambar %>" required>
-            </div>
+                <div class="form-group">
+                    <label for="gambar">URL Gambar:</label>
+                    <input type="text" name="gambar" placeholder="URL gambar" required>
+                </div>
 
-            <div class="form-group">
-                <label for="stok">Stok:</label>
-                <input type="number" name="stok" value="<%= product.stok %>" required>
-            </div>
+                <div class="form-group">
+                    <label for="stok">Stok:</label>
+                    <input type="number" name="stok" placeholder="Jumlah stok" required>
+                </div>
 
-            <div class="form-group">
-                <label for="harga">Harga:</label>
-                <input type="number" name="harga" value="<%= product.harga %>" required>
-            </div>
+                <div class="form-group">
+                    <label for="harga">Harga:</label>
+                    <input type="number" name="harga" placeholder="Harga produk" required>
+                </div>
 
-            <div class="form-group">
-                <label for="deskripsi">Deskripsi:</label>
-                <textarea name="deskripsi" required><%= product.deskripsi %></textarea>
-            </div>
+                <div class="form-group">
+                    <label for="deskripsi">Deskripsi:</label>
+                    <textarea name="deskripsi" placeholder="Deskripsi produk" required></textarea>
+                </div>
 
-            <div class="form-group">
-                <label for="id_kategori">ID Kategori:</label>
-                <input type="number" name="id_kategori" value="<%= product.id_kategori %>" required>
-            </div>
+                <div class="form-group">
+                    <label for="id_kategori">ID Kategori:</label>
+                    <input type="number" name="id_kategori" placeholder="ID kategori" required>
+                </div>
 
-            <button type="submit">Update Produk</button>
-        </form>
+                <button type="submit">Tambah Produk</button>
+            </form>
+        </div>
     </div>
 
 </body>

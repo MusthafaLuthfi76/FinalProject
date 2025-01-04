@@ -23,58 +23,58 @@ app.get('/', (req, res) => {
     });
 });
 
-// Halaman utama untuk mengelola produk (Admin Panel)
-app.get('/admin/products', (req, res) => {
-    const sql = `SELECT product.id_product, product.nama_product, product.gambar, product.stok, product.harga, product.deskripsi, kategori.nama_kategori 
-                 FROM product 
-                 JOIN kategori ON product.id_kategori = kategori.id_kategori`;
+// GET - Display all products
+app.get('/admin', (req, res) => {
+    let sql = 'SELECT * FROM product';
     db.query(sql, (err, results) => {
         if (err) throw err;
         res.render('admin', { products: results });
     });
 });
 
-// CREATE - Menambah produk baru
-app.post('/admin/products', (req, res) => {
-    const { nama_product, gambar, stok, harga, deskripsi, id_kategori } = req.body;
-    const sql = `INSERT INTO product (nama_product, gambar, stok, harga, deskripsi, id_kategori) VALUES (?, ?, ?, ?, ?, ?)`;
+// GET - Render insert product form
+app.get('/admin/insert', (req, res) => {
+    res.render('insert');
+});
+
+// POST - Insert new product
+app.post('/admin/insert', (req, res) => {
+    let { nama_product, gambar, stok, harga, deskripsi, id_kategori } = req.body;
+    let sql = 'INSERT INTO product (nama_product, gambar, stok, harga, deskripsi, id_kategori) VALUES (?, ?, ?, ?, ?, ?)';
     db.query(sql, [nama_product, gambar, stok, harga, deskripsi, id_kategori], (err, result) => {
         if (err) throw err;
-        res.redirect('/admin/products');
+        res.redirect('/admin');
     });
 });
 
-// UPDATE - Mengedit produk (menampilkan data lama di form)
-app.get('/admin/products/edit/:id', (req, res) => {
-    const { id } = req.params;
-    const sql = `SELECT * FROM product WHERE id_product = ?`;
-    db.query(sql, [id], (err, result) => {
+// GET - Render edit product form
+app.get('/admin/edit/:id', (req, res) => {
+    let sql = 'SELECT * FROM product WHERE id_product = ?';
+    db.query(sql, [req.params.id], (err, result) => {
         if (err) throw err;
         res.render('edit', { product: result[0] });
     });
 });
 
-
-// UPDATE - Simpan perubahan produk
-app.post('/admin/products/update/:id', (req, res) => {
-    const { id } = req.params;
-    const { nama_product, gambar, stok, harga, deskripsi, id_kategori } = req.body;
-    const sql = `UPDATE product SET nama_product = ?, gambar = ?, stok = ?, harga = ?, deskripsi = ?, id_kategori = ? WHERE id_product = ?`;
-    db.query(sql, [nama_product, gambar, stok, harga, deskripsi, id_kategori, id], (err, result) => {
+// POST - Update product
+app.post('/admin/edit/:id', (req, res) => {
+    let { nama_product, gambar, stok, harga, deskripsi, id_kategori } = req.body;
+    let sql = 'UPDATE product SET nama_product = ?, gambar = ?, stok = ?, harga = ?, deskripsi = ?, id_kategori = ? WHERE id_product = ?';
+    db.query(sql, [nama_product, gambar, stok, harga, deskripsi, id_kategori, req.params.id], (err, result) => {
         if (err) throw err;
-        res.redirect('/admin/products');
+        res.redirect('/admin');
     });
 });
 
-// DELETE - Menghapus produk
-app.get('/admin/products/delete/:id', (req, res) => {
-    const { id } = req.params;
-    const sql = `DELETE FROM product WHERE id_product = ?`;
-    db.query(sql, [id], (err, result) => {
+// GET - Delete product
+app.get('/admin/delete/:id', (req, res) => {
+    let sql = 'DELETE FROM product WHERE id_product = ?';
+    db.query(sql, [req.params.id], (err, result) => {
         if (err) throw err;
-        res.redirect('/admin/products');
+        res.redirect('/admin');
     });
 });
+
 
 // Jalankan server
 app.listen(port, () => {

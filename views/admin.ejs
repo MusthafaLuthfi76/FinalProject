@@ -4,48 +4,131 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Produk</title>
+    <style>
+        /* Basic styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    display: flex;
+}
+
+.sidebar {
+    width: 200px;
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    height: 100vh;
+}
+
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar ul li {
+    margin: 15px 0;
+}
+
+.sidebar ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+.main-content {
+    flex: 1;
+    padding: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+img {
+    max-width: 100px;
+    max-height: 100px;
+}
+
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+button {
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+    </style>
 </head>
 <body>
-    <h1>Daftar Produk</h1>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Nama Produk</th>
-                <th>Gambar</th>
-                <th>Stok</th>
-                <th>Harga</th>
-                <th>Deskripsi</th>
-                <th>Kategori</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% products.forEach(function(product) { %>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <img src="https://pngimg.com/d/github_PNG15.png" alt="Logo">
+        </div>
+        <ul class="menu">
+            <li><a href="/admin">Daftar Produk</a></li>
+            <li><a href="/admin/insert">Insert Produk</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1>Daftar Produk</h1>
+        <table>
+            <thead>
                 <tr>
+                    <th>ID</th>
+                    <th>Nama Produk</th>
+                    <th>Gambar</th>
+                    <th>Stok</th>
+                    <th>Harga</th>
+                    <th>Deskripsi</th>
+                    <th>Kategori</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% products.forEach(function(product) { %>
+                <tr>
+                    <td><%= product.id_product %></td>
                     <td><%= product.nama_product %></td>
-                    <td><img src="<%= product.gambar %>" width="100"></td>
+                    <td><img src="<%= product.gambar %>" alt="<%= product.nama_product %>" width="100"></td>
                     <td><%= product.stok %></td>
                     <td><%= product.harga %></td>
                     <td><%= product.deskripsi %></td>
-                    <td><%= product.nama_kategori %></td>
+                    <td><%= product.id_kategori %></td>
                     <td>
-                        <a href="/admin/products/edit/<%= product.id_product %>">Edit</a>
-                        <a href="/admin/products/delete/<%= product.id_product %>" onclick="return confirm('Yakin ingin menghapus produk ini?')">Hapus</a>
+                        <a href="/admin/edit/<%= product.id_product %>">Edit</a>
+                        <a href="/admin/delete/<%= product.id_product %>" onclick="return confirm('Apakah Anda yakin ingin menghapus produk ini?')">Delete</a>
                     </td>
                 </tr>
-            <% }); %>
-        </tbody>
-    </table>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
 
-    <h2>Tambah Produk Baru</h2>
-    <form action="/admin/products" method="POST">
-        Nama Produk: <input type="text" name="nama_product" required><br>
-        Gambar URL: <input type="text" name="gambar" required><br>
-        Stok: <input type="number" name="stok" required><br>
-        Harga: <input type="number" name="harga" required><br>
-        Deskripsi: <textarea name="deskripsi" required></textarea><br>
-        ID Kategori: <input type="number" name="id_kategori" required><br>
-        <button type="submit">Tambah Produk</button>
-    </form>
 </body>
 </html>
