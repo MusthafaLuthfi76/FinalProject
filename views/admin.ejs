@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Produk</title>
+</head>
+<body>
+    <h1>Daftar Produk</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Nama Produk</th>
+                <th>Gambar</th>
+                <th>Stok</th>
+                <th>Harga</th>
+                <th>Deskripsi</th>
+                <th>Kategori</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% products.forEach(function(product) { %>
+                <tr>
+                    <td><%= product.nama_product %></td>
+                    <td><img src="<%= product.gambar %>" width="100"></td>
+                    <td><%= product.stok %></td>
+                    <td><%= product.harga %></td>
+                    <td><%= product.deskripsi %></td>
+                    <td><%= product.nama_kategori %></td>
+                    <td>
+                        <a href="/admin/products/edit/<%= product.id_product %>">Edit</a>
+                        <a href="/admin/products/delete/<%= product.id_product %>" onclick="return confirm('Yakin ingin menghapus produk ini?')">Hapus</a>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+
+    <h2>Tambah Produk Baru</h2>
+    <form action="/admin/products" method="POST">
+        Nama Produk: <input type="text" name="nama_product" required><br>
+        Gambar URL: <input type="text" name="gambar" required><br>
+        Stok: <input type="number" name="stok" required><br>
+        Harga: <input type="number" name="harga" required><br>
+        Deskripsi: <textarea name="deskripsi" required></textarea><br>
+        ID Kategori: <input type="number" name="id_kategori" required><br>
+        <button type="submit">Tambah Produk</button>
+    </form>
+</body>
+</html>

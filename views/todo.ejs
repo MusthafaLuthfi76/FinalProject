@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+    *{
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+        }
+        .banner{
+            width: 100%;
+            height: 10vh;
+            background-image: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75));
+            background-size: cover;
+            background-position: center;
+        }
+        .navbar{
+            width: 85%;
+            margin: auto;
+            padding: 3px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: absolute; 
+            top: 0; 
+            left: 50%;  
+            transform: translateX(-50%);  
+        }
+        .logo{
+            width: 120px;
+            cursor: pointer;
+            margin: auto;
+        }
+        .navbar .nav-items {
+            display: flex;
+            justify-content: center;
+            flex-grow: 1;
+        }
+        .navbar ul li {
+            list-style: none;
+            display: inline-block;
+            margin: 0 20px;
+            position: relative;
+        }
+
+        .navbar ul li a {
+            text-decoration: none;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        .navbar ul li::after{
+            content: '';
+            height: 3px;
+            width: 0;
+            background: #009688;
+            position: absolute;
+            left: 0;
+            bottom: -10px;
+            transition: 0.5s;
+        }
+        .navbar ul li:hover::after{
+            width: 100%;
+        }
+
+        .logout-button {
+            background: #009688;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            align-items: end;
+        }
+        .content{
+            width: 100%;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            text-align: center;
+            color: #fff;
+        }
+        .content h1{
+            font-size: 70px;
+            margin-top: 80px;
+        }
+        .content p{
+            margin: 20px auto;
+            font-weight: 100;
+            line-height: 25px;
+        }
+        button{
+            width: 200px;
+            padding: 15px 0;
+            text-align: center;
+            margin: 20px 10px;
+            border-radius: 25px;
+            font-weight: bold;
+            border: 2px solid #009688;
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        span{
+            background: #009688;
+            height: 100%;
+            width: 0;
+            border-radius: 25px;
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            z-index: -1;
+            transition: 0.5s;
+        }
+        button:hover span{
+            width: 100%;
+        }
+        button:hover{
+            border: none;
+        }
+        footer{
+            width: 100%;
+            padding: 20px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            position: relative;
+            bottom: 0;
+        }
+        @media (max-width: 768px) {
+            .navbar ul {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .content h1 {
+                font-size: 50px;
+            }
+        }
+        .form-control {
+            margin-bottom: 15px;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 16px;
+        }
+        .container h1 {
+            color: #000000;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .form-group label {
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .container {
+            padding: 50px 15px;
+        }
+
+        .todo-card {
+            transition: transform 0.2s ease-in-out;
+            box-shadow: 0px 5px 10px 1px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .todo-card:hover {
+            transform: scale(1.05);
+        }
+
+        .btn {
+            border-radius: 20px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #000;
+        }
+
+        .completed {
+            text-decoration: line-through;
+            color: #6c757d;
+        }
+
+        .add-btn {
+            border-radius: 20px;
+            font-size: 1rem;
+            padding: 10px 20px;
+            left: 42%;
+        }
+
+        .card-text {
+            font-size: 1rem;
+        }
+
+        .editBtn, .deleteBtn {
+            margin-right: 5px;
+        }
+
+        footer{
+            width: 100%;
+            padding: 20px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            position: relative;
+            bottom: 0;
+        }
+
+        @media (max-width: 768px) {
+            .navbar ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .container {
+                padding: 30px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="banner">
+        <div class="navbar">
+            <img src="https://pngimg.com/d/github_PNG15.png" class="logo" alt="Logo">
+            <div class="nav-items">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                    <li><a href="/todo-view">Todo</a></li>
+                </ul>
+            </div>
+            <a href="/login">
+                <button class="logout-button">Logout</button>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1 class="text-center mb-4">Todo List</h1>
+
+        <!-- Button to open modal to add new todo -->
+        <button class="btn btn-primary add-btn mb-4" data-bs-toggle="modal" data-bs-target="#addModal">Add Todo</button>
+
+        <!-- Grid of Todos as Cards -->
+        <div class="row" id="todoCards">
+            <% todos.forEach(todo => { %>
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card todo-card p-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Todo</h5>
+                        <p class="card-text <%= todo.completed ? 'completed' : '' %>"><%= todo.task %></p>
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-sm btn-success editBtn" data-id="<%= todo.id %>">Edit</button>
+                            <button class="btn btn-sm btn-danger deleteBtn" data-id="<%= todo.id %>">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+        </div>
+    </div>
+
+    <!-- Modal for Adding New Todo -->
+    <div id="addModal" class="modal fade" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addModalLabel">Add Todo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addTodoForm">
+                        <div class="form-group">
+                            <label for="newTask">Task</label>
+                            <input type="text" id="newTask" class="form-control" placeholder="Enter task" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3">Add Task</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Editing Todo -->
+    <div id="editModal" class="modal fade" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit Todo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editTodoForm">
+                        <div class="form-group">
+                            <label for="editTask">Task</label>
+                            <input type="text" id="editTask" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Your Company. All rights reserved.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Add new todo
+            $('#addTodoForm').on('submit', function (e) {
+                e.preventDefault();
+                const task = $('#newTask').val().trim();
+                if (task) {
+                    $.ajax({
+                        url: '/todos',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ task: task }),
+                        success: function (newTodo) {
+                            location.reload(); // Reload to show the new todo
+                        },
+                        error: function (error) {
+                            console.error("Error adding task:", error.responseText);
+                        }
+                    });
+                }
+            });
+
+            // Delete a todo
+            $('.deleteBtn').on('click', function () {
+                const id = $(this).data('id');
+                $.ajax({
+                    url: '/todos/' + id,
+                    type: 'DELETE',
+                    success: function () {
+                        location.reload(); // Reload to show updated list
+                    }
+                });
+            });
+
+            // Show edit modal with the current task
+            let editId;
+            $('.editBtn').on('click', function () {
+                editId = $(this).data('id');
+                const currentTask = $(this).closest('.card-body').find('p').text();
+                $('#editTask').val(currentTask);
+                $('#editModal').modal('show');
+            });
+
+            // Update todo on form submission
+            $('#editTodoForm').on('submit', function (e) {
+                e.preventDefault();
+                const task = $('#editTask').val().trim();
+                if (task) {
+                    $.ajax({
+                        url: '/todos/' + editId,
+                        type: 'PUT',
+                        data: JSON.stringify({ task: task, completed: false }),
+                        contentType: 'application/json',
+                        success: function () {
+                            location.reload(); // Reload to show the updated todo
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

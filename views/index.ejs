@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Pakaian Muslim</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+        }
+        .banner {
+            width: 100%;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            width: 85%;
+            margin: auto;
+            padding: 3px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            width: 120px;
+            cursor: pointer;
+            margin: auto;
+        }
+        .navbar ul li {
+            list-style: none;
+            display: inline-block;
+            margin: 0 20px;
+            position: relative;
+        }
+
+        .navbar ul li a {
+            text-decoration: none;
+            color: #000;
+            text-transform: uppercase;
+        }
+
+        .navbar ul li:hover a {
+            color: #009688;
+        }
+
+        .logout-button {
+            background: #009688;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .card img {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        footer {
+            width: 100%;
+            padding: 20px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <img src="https://pngimg.com/d/github_PNG15.png" class="logo" alt="Logo">
+        <ul class="nav">
+            <li><a href="/">Home</a></li>
+            <li><a href="/shop">Shop</a></li>
+            <li><a href="/contact">Contact</a></li>
+        </ul>
+        <a href="/login">
+            <button class="logout-button">Logout</button>
+        </a>
+    </div>
+
+    <!-- Carousel -->
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="https://pojokmungil.com/wp-content/uploads/2021/12/rekomendasi-brand-hijab.jpg" class="d-block w-100" alt="..." style="height: 400px; object-fit: cover;">
+            </div>
+            <div class="carousel-item">
+                <img src="https://i.pinimg.com/736x/f7/7a/43/f77a43db0729eb44a27f82e2d0c21a53.jpg" class="d-block w-100" alt="..." style="height: 400px; object-fit: cover;">
+            </div>
+            <div class="carousel-item">
+                <img src="https://i.pinimg.com/736x/f7/7a/43/f77a43db0729eb44a27f82e2d0c21a53.jpg" class="d-block w-100" alt="..." style="height: 400px; object-fit: cover;">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
+    <!-- Modal Bootstrap -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="productModalLabel">Detail Produk</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <img src="" id="productImage" class="img-fluid mb-3" alt="Product Image">
+          <h5 id="productName"></h5>
+          <p id="productDescription"></p>
+          <p><strong>Harga: </strong> <span id="productPrice"></span></p>
+          <a href="#" id="whatsappLink" class="btn btn-success" target="_blank">
+            Checkout via WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+    <!-- Produk Cards -->
+    <div class="container my-5">
+        <div class="row">
+          <% product.forEach(data => { %>
+          <div class="col-md-4">
+            <div class="card">
+              <img src="<%= data.gambar %>" class="card-img-top" alt="<%= data.nama_product %>">
+              <div class="card-body">
+                <h5 class="card-title"><%= data.nama_product %></h5>
+                <p class="card-text"><%= data.deskripsi %></p>
+                <p class="card-text">Rp <%= data.harga %></p>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal"
+                  onclick="openProductModal('<%= data.gambar %>', '<%= data.nama_product %>', '<%= data.deskripsi %>', '<%= data.harga %>', '<%= data.id %>')">
+                  Lihat Detail
+                </button>
+              </div>
+            </div>
+          </div>
+          <% }); %>
+        </div>
+      </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 E-Commerce Pakaian Muslim. All rights reserved.</p>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+<script>
+    function openProductModal(image, name, description, price, id) {
+      document.getElementById('productImage').src = image;
+      document.getElementById('productName').textContent = name;
+      document.getElementById('productDescription').textContent = description;
+      document.getElementById('productPrice').textContent = 'Rp ' + price;
+  
+      // Set up WhatsApp link with product name and price
+      const whatsappNumber = '628123456789'; // Ganti dengan nomor WhatsApp penjual
+      const message = `Halo, saya tertarik dengan produk ${name}. Harga: Rp ${price}. Bagaimana cara pembayarannya?`;
+      document.getElementById('whatsappLink').href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    }
+  </script>
+  
+</html>
