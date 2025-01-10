@@ -32,12 +32,14 @@ router.post('/login', (req, res) => {
         if (err) return res.status(500).send('Error fetching user');
         if (results.length === 0) return res.status(400).send('User not found');
 
+        console.log('User found:', results[0]); // Debug hasil query
+        console.log('Password yang dimasukkan:', password); 
         bcrypt.compare(password, results[0].password, (err, isMatch) => {
             if (err) return res.status(500).send('Error checking password');
             if (!isMatch) return res.status(401).send('Incorrect password');
 
             // Simpan userId dalam sesi setelah login berhasil
-            req.session.userId = results[0].id;
+            req.session.userId = results[0].id_user;
             res.redirect('/');
         });
     });
