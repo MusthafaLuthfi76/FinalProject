@@ -39,6 +39,7 @@ const upload = multer({ storage: storage });
 
 // Middleware untuk file statis
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use(express.static('views'));
 
 // Setting EJS sebagai template engin
 app.use('/', authRoutes);
@@ -50,6 +51,8 @@ app.get('/login', (req, res) => {
         layout: 'layouts/main-layout',
     });
 });
+
+
 
 
 // Route untuk menampilkan halaman index dengan data dari database
