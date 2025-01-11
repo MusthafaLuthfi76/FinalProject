@@ -39,7 +39,8 @@ const upload = multer({ storage: storage });
 
 // Middleware untuk file statis
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use(express.static('views'));
+app.use(express.static(path.join(__dirname, 'views')));
+
 
 // Setting EJS sebagai template engin
 app.use('/', authRoutes);
@@ -51,9 +52,6 @@ app.get('/login', (req, res) => {
         layout: 'layouts/main-layout',
     });
 });
-
-
-
 
 // Route untuk menampilkan halaman index dengan data dari database
 app.get('/', isAuthenticated, (req, res) => {
@@ -69,6 +67,24 @@ app.get('/', isAuthenticated, (req, res) => {
         res.render('index', { product: results });
     });
 });
+
+// Route untuk menampilkan detail produk
+app.get('/product/:id', (req, res) => {
+    const productId = req.params.id;
+    const sql = 'SELECT * FROM product WHERE id_product = ?';
+    
+    db.query(sql, [productId], (err, result) => {
+      if (err) {
+        return res.status(500).send('Database error: ' + err);
+      }
+      if (result.length > 0) {
+        res.render('product-detail', { product: result[0] });
+      } else {
+        res.status(404).send('Produk tidak ditemukan');
+      }
+    });
+  });
+  
 
 // GET - Display all products
 app.get('/admin', (req, res) => {
