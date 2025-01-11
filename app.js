@@ -68,6 +68,29 @@ app.get('/', isAuthenticated, (req, res) => {
     });
 });
 
+app.get('/shop', (req, res) => {
+    const sql = 'SELECT * FROM product';
+    
+    // Query untuk mengambil data dari database
+    db.query(sql, (err, results) => {
+        if (err) {
+            return res.status(500).send('Database error: ' + err);
+        }
+
+        // Kirim hasil query ke EJS untuk dirender
+        res.render('shop', { product: results });
+    });
+  });
+
+  app.get('/why', (req, res) => {
+    res.render('why'); // Ensure the shop.ejs file exists in the views folder
+  });
+
+  app.get('/testimoni', (req, res) => {
+    res.render('testimonial'); // Ensure the shop.ejs file exists in the views folder
+  });
+
+
 // Route untuk menampilkan detail produk
 app.get('/product/:id', (req, res) => {
     const productId = req.params.id;
