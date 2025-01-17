@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Pesanan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #343a40;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #495057;
+        }
+
+        .container {
+            flex: 1;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #343a40;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: grid;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #495057;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #007bff;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+
+            .container {
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar section -->
+    <div class="sidebar">
+        <h2 class="logo">Admin Panel</h2>
+        <ul>
+            <li><a href="/admin">Daftar Produk</a></li>
+            <li><a href="/admin/insert">Insert Produk</a></li>
+            <li><a href="/admin/orders">Daftar Pesanan</a></li>
+        </ul>
+    </div>
+
+    <!-- Main content section -->
+    <div class="container">
+        <h1>Edit Pesanan</h1>
+        <form action="/admin/orders/edit/<%= order.id_order %>" method="POST">
+            <div>
+                <label for="id_product">ID Produk:</label>
+                <input type="number" id="id_product" name="id_product" value="<%= order.id_product %>" required>
+            </div>
+            <div>
+                <label for="color">Warna:</label>
+                <input type="text" id="color" name="color" value="<%= order.color %>" required>
+            </div>
+            <div>
+                <label for="size">Ukuran:</label>
+                <input type="text" id="size" name="size" value="<%= order.size %>" required>
+            </div>
+            <div>
+                <label for="quantity">Jumlah:</label>
+                <input type="number" id="quantity" name="quantity" value="<%= order.quantity %>" required>
+            </div>
+            <div>
+                <label for="address">Alamat:</label>
+                <textarea id="address" name="address" rows="3" required><%= order.address %></textarea>
+            </div>
+            <button type="submit">Simpan Perubahan</button>
+        </form>
+    </div>
+</body>
+
+</html>

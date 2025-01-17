@@ -27,6 +27,19 @@
   <link href="css/style.css" rel="stylesheet" />
   <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
+
+  <style>
+    .product-card {
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+  </style>
 </head>
 
 <body>
@@ -93,42 +106,46 @@
 
   <!-- shop section -->
 
-  <section class="shop_section layout_padding">
-    <div class="container">
-      <div class="heading_container heading_center">
-        <h2>Produk Kami</h2>
-      </div>
-      <div class="row">
-        <% product.forEach(product => { %> 
-          <div class="col-sm-6 col-md-4 col-lg-3">
-            <div class="box">
-              <a href="/product/<%= product.id_product %>"> <!-- Ganti dengan ID produk -->
-                <div class="img-box">
-                  <img src="<%= product.gambar %>" alt="<%= product.nama_product %>">
+  <main class="container mt-4">
+    <section class="shop_section">
+        <div class="heading_container text-center mb-4">
+            <h2>Produk Kami</h2>
+        </div>
+        <div class="row">
+            <% product.forEach(product => { %>
+            <div class="col-sm-6 col-md-4 col-lg-3">
+                <div 
+                    class="card mb-3 product-card" 
+                    data-id="<%= product.id_product %>" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#productModal"
+                >
+                    <img src="<%= product.gambar %>" class="card-img-top" alt="<%= product.nama_product %>">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"><%= product.nama_product %></h5>
+                        <p class="card-text text-danger">Rp<%= product.harga %></p>
+                    </div>
                 </div>
-                <div class="detail-box">
-                  <h6><%= product.nama_product %></h6>
-                  <h6>
-                    Harga
-                    <span>Rp<%= product.harga %></span>
-                  </h6>
-                </div>
-                <% if (product.stok > 0) { %>
-                  <div class="new">
-                    <span>Masih</span>
-                  </div>
-                <% } else { %>
-                  <div class="out-of-stock">
-                    <span>Habis</span>
-                  </div>
-                <% } %>
-              </a>
             </div>
-          </div>
-        <% }) %>
-      </div>
+            <% }) %>
+        </div>
+    </section>
+</main>
+
+<!-- Modal -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productModalLabel">Detail Produk</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalContent">
+                <!-- Konten akan dimuat dengan JavaScript -->
+            </div>
+        </div>
     </div>
-  </section>
+</div>
 
   <!-- end shop section -->
 
@@ -227,6 +244,67 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js">
   </script>
   <script src="js/custom.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.addEventListener('click', function () {
+            const productId = this.getAttribute('data-id');
+
+            // Fetch detail produk dari server
+            fetch(`/product/detail/${productId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const modalContent = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <img src="${data.gambar}" alt="${data.nama_product}" class="img-fluid">
+                            </div>
+                            <div class="col-md-6">
+                                <h3>${data.nama_product}</h3>
+                                <p>${data.deskripsi}</p>
+                                <p><strong>Harga:</strong> Rp${data.harga}</p>
+                                <form action="/order" method="POST">
+                                    <input type="hidden" name="id_product" value="${data.id_product}">
+                                    <div class="mb-3">
+                                        <label for="color" class="form-label">Warna</label>
+                                        <select name="color" id="color" class="form-control">
+                                            <option value="Black">Black</option>
+                                            <option value="Gray">Gray</option>
+                                            <option value="Truffle">Truffle</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="size" class="form-label">Ukuran</label>
+                                        <select name="size" id="size" class="form-control">
+                                            <option value="S">S</option>
+                                            <option value="M">M</option>
+                                            <option value="L">L</option>
+                                            <option value="XL">XL</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="quantity" class="form-label">Jumlah</label>
+                                        <input type="number" name="quantity" id="quantity" class="form-control" min="1" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="address" class="form-label">Alamat Pengiriman</label>
+                                        <textarea name="address" id="address" class="form-control" rows="3" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-success w-100">Pesan Sekarang</button>
+                                </form>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('modalContent').innerHTML = modalContent;
+                })
+                .catch(error => console.error('Error fetching product details:', error));
+        });
+    });
+});
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 

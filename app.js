@@ -130,8 +130,6 @@ app.get('/logout', (req, res) => {
     });
 });
 
-
-  
 app.post('/order', (req, res) => {
     const { id_product, color, size, quantity, address } = req.body;
 
@@ -246,8 +244,66 @@ app.get('/admin/delete/:id', (req, res) => {
     });
 });
 
-
-// Jalankan server
-app.listen(port, () => {
-    console.log(`Server berjalan di http://localhost:${port}`);
+// GET - Daftar semua pesanan
+app.get('/admin/orders', (req, res) => {
+    const sql = 'SELECT * FROM orders';
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('Error fetching orders:', err);
+            return res.status(500).send('Database error');
+        }
+        res.render('orders', { orders: results });
+    });
 });
+
+// GET - Render form edit pesanan
+app.get('/admin/orders/edit/:id', (req, res) => {
+    const orderId = req.params.id;
+    const sql = 'SELECT * FROM orders WHERE id_order = ?';
+    db.query(sql, [orderId], (err, result) => {
+        if (err) {
+            console.error('Error fetching order for edit:', err);
+            return res.status(500).send('Database error');
+        }
+        if (result.length > 0) {
+            res.render('edit-order', { order: result[0] });
+        } else {
+            res.status(404).send('Pesanan tidak ditemukan');
+        }
+    });
+});
+
+// POST - Update pesanan
+app.post('/admin/orders/edit/:id', (req, res) => {
+    const orderId = req.params.id;
+    const { id_product, color, size, quantity, address } = req.body;
+    const sql = 'UPDATE orders SET id_product = ?, color = ?, size = ?, quantity = ?, address = ? WHERE id_order = ?';
+    db.query(sql, [id_product, color, size, quantity, address, orderId], (err) => {
+        if (err) {
+            console.error('Error updating order:', err);
+            return res.status(500).send('Database error');
+        }
+        res.redirect('/admin/orders');
+    });
+});
+
+// GET - Hapus pesanan
+app.get('/admin/orders/delete/:id', (req, res) => {
+    const orderId = req.params.id;
+    const sql = 'DELETE FROM orders WHERE id_order = ?';
+    db.query(sql, [orderId], (err) => {
+        if (err) {
+            console.error('Error deleting order:', err);
+            return res.status(500).send('Database error');
+        }
+        res.redirect('/admin/orders');
+    });
+});
+
+if (require.main === module) {
+    app.listen(port, () => {
+        console.log(`Server berjalan di http://localhost:${port}`);
+    });
+}
+
+module.exports = app; // Ekspor app untuk pengujian

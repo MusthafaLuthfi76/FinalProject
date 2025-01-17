@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Pesanan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            background-color: #f4f4f9;
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            width: 250px;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 20px 0;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            display: block;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #575757;
+            padding-left: 10px;
+            transition: 0.3s;
+        }
+
+        /* Main content styling */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        img {
+    max-width: 100px;
+    max-height: 100px;
+}
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar section -->
+    <div class="sidebar">
+        <div class="logo">
+            <img src="https://pngimg.com/d/github_PNG15.png" alt="Logo">
+        </div>
+        <ul class="menu">
+            <li><a href="/admin">Daftar Produk</a></li>
+            <li><a href="/admin/insert">Insert Produk</a></li>
+            <li><a href="/admin/orders">Daftar Pesanan</a></li>
+        </ul>
+    </div>
+
+    <!-- Main content section -->
+    <div class="main-content">
+        <h1>Daftar Pesanan</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>ID Produk</th>
+                    <th>Warna</th>
+                    <th>Ukuran</th>
+                    <th>Jumlah</th>
+                    <th>Alamat</th>
+                    <th>Tgl Pemesanan</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% orders.forEach(function(order) { %>
+                <tr>
+                    <td><%= order.id_order %></td>
+                    <td><%= order.id_product %></td>
+                    <td><%= order.color %></td>
+                    <td><%= order.size %></td>
+                    <td><%= order.quantity %></td>
+                    <td><%= order.address %></td>
+                    <td><%= new Date(order.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) %></td>
+                    <td>
+                        <a href="/admin/orders/edit/<%= order.id_order %>">Edit</a>
+                        <a href="/admin/orders/delete/<%= order.id_order %>" onclick="return confirm('Apakah Anda yakin ingin menghapus pesanan ini?')">Hapus</a>
+                    </td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
