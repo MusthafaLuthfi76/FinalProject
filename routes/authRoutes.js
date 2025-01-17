@@ -26,24 +26,25 @@ router.get('/signup', (req, res) => {
 
 // Route Login
 router.post('/login', (req, res) => {
+    console.log('Attempting to login:', req.body.username);
     const { username, password } = req.body;
 
     db.query('SELECT * FROM users WHERE username = ?', [username], (err, results) => {
         if (err) return res.status(500).send('Error fetching user');
         if (results.length === 0) return res.status(400).send('User not found');
 
-        console.log('User found:', results[0]); // Debug hasil query
-        console.log('Password yang dimasukkan:', password); 
         bcrypt.compare(password, results[0].password, (err, isMatch) => {
             if (err) return res.status(500).send('Error checking password');
             if (!isMatch) return res.status(401).send('Incorrect password');
 
-            // Simpan userId dalam sesi setelah login berhasil
-            req.session.userId = results[0].id_user;
+            // Simpan status login ke sesi
+            req.session.isLoggedIn = true;
+            req.session.user = results[0]; // Simpan user info jika perlu
             res.redirect('/');
         });
     });
 });
+
 
 // Route untuk menampilkan form login
 router.get('/login', (req, res) => {
@@ -53,11 +54,12 @@ router.get('/login', (req, res) => {
 });
 
 // Route Logout
-router.post('/logout', (req, res) => {
+router.get('/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) return res.status(500).send('Error logging out');
-        res.redirect('/login'); // Arahkan ke halaman login setelah logout
+        res.redirect('/'); // Arahkan kembali ke halaman utama
     });
 });
+
 
 module.exports = router;

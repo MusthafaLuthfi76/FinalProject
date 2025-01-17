@@ -18,8 +18,19 @@ app.use(session({
     secret: process.env.SESSION_SECRET, 
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // Set ke true jika menggunakan HTTPS
+    cookie: { 
+        secure: false, // Set ke true jika menggunakan HTTPS
+        maxAge: 24 * 60 * 60 * 1000, // 1 hari
+    }
 }));
+
+// Middleware untuk membuat session isLoggedIn tersedia di semua view
+app.use((req, res, next) => {
+    res.locals.isLoggedIn = req.session.isLoggedIn || false;
+    console.log('isLoggedIn:', res.locals.isLoggedIn); // Tambahkan ini untuk debugging
+    next();
+});
+
 
 // Konfigurasi penyimpanan file menggunakan multer
 const storage = multer.diskStorage({
@@ -47,14 +58,9 @@ app.use('/', authRoutes);
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/login', (req, res) => {
-    res.render('login', {
-        layout: 'layouts/main-layout',
-    });
-});
-
 // Route untuk menampilkan halaman index dengan data dari database
-app.get('/', isAuthenticated, (req, res) => {
+app.get('/',  (req, res) => {
+    console.log('GET / - isLoggedIn:', req.session.isLoggedIn);
     const sql = 'SELECT * FROM product';
     
     // Query untuk mengambil data dari database
@@ -65,6 +71,79 @@ app.get('/', isAuthenticated, (req, res) => {
 
         // Kirim hasil query ke EJS untuk dirender
         res.render('index', { product: results });
+    });
+});
+
+app.get('/product/detail/:id', (req, res) => {
+    const productId = req.params.id;
+    const sql = 'SELECT * FROM product WHERE id_product = ?';
+    db.query(sql, [productId], (err, result) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        if (result.length > 0) {
+            res.json(result[0]); // Kirim detail produk sebagai JSON
+        } else {
+            res.status(404).json({ error: 'Produk tidak ditemukan' });
+        }
+    });
+});
+
+app.post('/order', (req, res) => {
+    const { id_product, color, size, quantity, address } = req.body;
+    const sql = `INSERT INTO orders (id_product, color, size, quantity, address) VALUES (?, ?, ?, ?, ?)`;
+    db.query(sql, [id_product, color, size, quantity, address], (err, result) => {
+        if (err) return res.status(500).send('Database error');
+        res.redirect('/'); // Redirect ke halaman utama
+    });
+});
+
+
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+
+    // Query database untuk autentikasi
+    const sql = 'SELECT * FROM users WHERE username = ? AND password = ?';
+    db.query(sql, [username, password], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Database error');
+        }
+
+        if (results.length > 0) {
+            req.session.isLoggedIn = true;
+            req.session.user = results[0]; // Simpan user info jika perlu
+            res.redirect('/');
+        } else {
+            res.redirect('/login');
+        }
+    });
+});
+
+
+app.get('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            console.error('Error destroying session:', err);
+            return res.redirect('/');
+        }
+        console.log('Session destroyed');
+        res.redirect('/');
+    });
+});
+
+
+  
+app.post('/order', (req, res) => {
+    const { id_product, color, size, quantity, address } = req.body;
+
+    const sql = `INSERT INTO orders (id_product, color, size, quantity, address) VALUES (?, ?, ?, ?, ?)`;
+    db.query(sql, [id_product, color, size, quantity, address], (err, result) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ success: false, message: 'Gagal memproses pesanan.' });
+        }
+
+        console.log('Pesanan berhasil masuk ke database');
+        res.json({ success: true, message: 'Pesanan berhasil dibuat!' });
     });
 });
 
