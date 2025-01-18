@@ -81,20 +81,17 @@
             </li>
           </ul>
           <div class="user_option">
-            <a href="">
-              <i class="fa fa-user" aria-hidden="true"></i>
-              <span>
-                Login
-              </span>
-            </a>
-            <a href="">
-              <i class="fa fa-shopping-bag" aria-hidden="true"></i>
-            </a>
-            <form class="form-inline ">
-              <button class="btn nav_search-btn" type="submit">
-                <i class="fa fa-search" aria-hidden="true"></i>
-              </button>
-            </form>
+            <% if (isLoggedIn) { %>
+              <a href="/logout">
+                <i class="fa fa-user" aria-hidden="true"></i>
+                <span>Logout</span>
+              </a>
+            <% } else { %>
+              <a href="/login">
+                <i class="fa fa-user" aria-hidden="true"></i>
+                <span>Login</span>
+              </a>
+            <% } %>
           </div>
         </div>
       </nav>
