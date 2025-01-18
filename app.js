@@ -53,6 +53,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'views')));
 
 
+
 // Setting EJS sebagai template engin
 app.use('/', authRoutes);
 app.set('view engine', 'ejs');

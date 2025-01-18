@@ -1,10 +1,15 @@
-// Middleware untuk memeriksa autentikasi
 function isAuthenticated(req, res, next) {
-    if (req.session.userId) {
+    if (req.session.isLoggedIn) {
         return next();
-    } else {
-        res.redirect('/login');
     }
+    return res.redirect('/login');
 }
 
-module.exports = { isAuthenticated };
+function isAdmin(req, res, next) {
+    if (req.session.user && req.session.user.role === 'admin') {
+        return next();
+    }
+    return res.status(403).send('Akses ditolak. Anda bukan admin.');
+}
+
+module.exports = { isAuthenticated, isAdmin };

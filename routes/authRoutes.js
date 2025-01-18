@@ -3,10 +3,30 @@ const bcrypt = require('bcryptjs');
 const db = require('../database/db');
 const router = express.Router();
 
+
+const username = 'admin';
+const password = 'admin123';
+
+bcrypt.hash(password, 10, (err, hash) => {
+    if (err) {
+        console.error('Error hashing password:', err);
+        return;
+    }
+
+    const sql = 'INSERT INTO admin (username, password) VALUES (?, ?)';
+    db.query(sql, [username, hash], (err, result) => {
+        if (err) {
+            console.error('Error inserting admin:', err);
+        } else {
+            console.log('Admin berhasil ditambahkan');
+        }
+    });
+});
 // Route Signup
 router.post('/signup', (req, res) => {
     const { username, password } = req.body;
 
+    // Hash password sebelum menyimpan
     bcrypt.hash(password, 10, (err, hash) => {
         if (err) return res.status(500).send('Error hashing password');
 
@@ -20,28 +40,49 @@ router.post('/signup', (req, res) => {
 // Route untuk menampilkan form signup
 router.get('/signup', (req, res) => {
     res.render('signup', {
-        layout: 'layouts/main-layout'
+        layout: 'layouts/main-layout',
     });
 });
 
 // Route Login
+// Route Login
 router.post('/login', (req, res) => {
-    console.log('Attempting to login:', req.body.username);
     const { username, password } = req.body;
 
-    db.query('SELECT * FROM users WHERE username = ?', [username], (err, results) => {
-        if (err) return res.status(500).send('Error fetching user');
-        if (results.length === 0) return res.status(400).send('User not found');
+    // Periksa di tabel admin
+    db.query('SELECT * FROM admin WHERE username = ?', [username], (err, adminResults) => {
+        if (err) return res.status(500).send('Error fetching admin data');
+        
+        if (adminResults.length > 0) {
+            // Jika username ditemukan di tabel admin
+            const admin = adminResults[0];
+            bcrypt.compare(password, admin.password, (err, isMatch) => {
+                if (err) return res.status(500).send('Error checking password');
+                if (!isMatch) return res.status(401).send('Incorrect password');
 
-        bcrypt.compare(password, results[0].password, (err, isMatch) => {
-            if (err) return res.status(500).send('Error checking password');
-            if (!isMatch) return res.status(401).send('Incorrect password');
+                // Simpan status login admin
+                req.session.isLoggedIn = true;
+                req.session.user = { id: admin.id_admin, username: admin.username, role: 'admin' };
+                return res.redirect('/admin'); // Arahkan ke halaman admin
+            });
+        } else {
+            // Jika tidak ditemukan di tabel admin, periksa di tabel users
+            db.query('SELECT * FROM users WHERE username = ?', [username], (err, userResults) => {
+                if (err) return res.status(500).send('Error fetching user data');
+                if (userResults.length === 0) return res.status(400).send('User not found');
 
-            // Simpan status login ke sesi
-            req.session.isLoggedIn = true;
-            req.session.user = results[0]; // Simpan user info jika perlu
-            res.redirect('/');
-        });
+                const user = userResults[0];
+                bcrypt.compare(password, user.password, (err, isMatch) => {
+                    if (err) return res.status(500).send('Error checking password');
+                    if (!isMatch) return res.status(401).send('Incorrect password');
+
+                    // Simpan status login user
+                    req.session.isLoggedIn = true;
+                    req.session.user = { id: user.id, username: user.username, role: 'user' };
+                    return res.redirect('/'); // Arahkan ke halaman utama
+                });
+            });
+        }
     });
 });
 
@@ -49,7 +90,7 @@ router.post('/login', (req, res) => {
 // Route untuk menampilkan form login
 router.get('/login', (req, res) => {
     res.render('login', {
-        layout: 'layouts/main-layout'
+        layout: 'layouts/main-layout',
     });
 });
 
@@ -60,6 +101,5 @@ router.get('/logout', (req, res) => {
         res.redirect('/'); // Arahkan kembali ke halaman utama
     });
 });
-
 
 module.exports = router;
