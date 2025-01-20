@@ -261,35 +261,42 @@
                                 <h3>${data.nama_product}</h3>
                                 <p>${data.deskripsi}</p>
                                 <p><strong>Harga:</strong> Rp${data.harga}</p>
-                                <form action="/order" method="POST">
-                                    <input type="hidden" name="id_product" value="${data.id_product}">
-                                    <div class="mb-3">
-                                        <label for="color" class="form-label">Warna</label>
-                                        <select name="color" id="color" class="form-control">
-                                            <option value="Black">Black</option>
-                                            <option value="Gray">Gray</option>
-                                            <option value="Truffle">Truffle</option>
-                                        </select>
+                                <% if (isLoggedIn) { %>
+                                    <form action="/order" method="POST">
+                                        <input type="hidden" name="id_product" value="${data.id_product}">
+                                        <div class="mb-3">
+                                            <label for="color" class="form-label">Warna</label>
+                                            <select name="color" id="color" class="form-control">
+                                                <option value="Black">Black</option>
+                                                <option value="Gray">Gray</option>
+                                                <option value="Truffle">Truffle</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="size" class="form-label">Ukuran</label>
+                                            <select name="size" id="size" class="form-control">
+                                                <option value="S">S</option>
+                                                <option value="M">M</option>
+                                                <option value="L">L</option>
+                                                <option value="XL">XL</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="quantity" class="form-label">Jumlah</label>
+                                            <input type="number" name="quantity" id="quantity" class="form-control" min="1" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="address" class="form-label">Alamat Pengiriman</label>
+                                            <textarea name="address" id="address" class="form-control" rows="3" required></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-success w-100">Pesan Sekarang</button>
+                                    </form>
+                                <% } else { %>
+                                    <div class="alert alert-warning">
+                                        Anda harus login untuk melakukan order.
+                                        <a href="/login" class="btn btn-primary mt-2">Login</a>
                                     </div>
-                                    <div class="mb-3">
-                                        <label for="size" class="form-label">Ukuran</label>
-                                        <select name="size" id="size" class="form-control">
-                                            <option value="S">S</option>
-                                            <option value="M">M</option>
-                                            <option value="L">L</option>
-                                            <option value="XL">XL</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="quantity" class="form-label">Jumlah</label>
-                                        <input type="number" name="quantity" id="quantity" class="form-control" min="1" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="address" class="form-label">Alamat Pengiriman</label>
-                                        <textarea name="address" id="address" class="form-control" rows="3" required></textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-success w-100">Pesan Sekarang</button>
-                                </form>
+                                <% } %>
                             </div>
                         </div>
                     `;

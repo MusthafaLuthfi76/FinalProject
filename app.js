@@ -88,7 +88,7 @@ app.get('/product/detail/:id', (req, res) => {
     });
 });
 
-app.post('/order', (req, res) => {
+app.post('/order', isAuthenticated, (req, res) => {
     const { id_product, color, size, quantity, address } = req.body;
     const sql = `INSERT INTO orders (id_product, color, size, quantity, address) VALUES (?, ?, ?, ?, ?)`;
     db.query(sql, [id_product, color, size, quantity, address], (err, result) => {
@@ -131,7 +131,7 @@ app.get('/logout', (req, res) => {
     });
 });
 
-app.post('/order', (req, res) => {
+app.post('/order', isAuthenticated, (req, res) => {
     const { id_product, color, size, quantity, address } = req.body;
 
     const sql = `INSERT INTO orders (id_product, color, size, quantity, address) VALUES (?, ?, ?, ?, ?)`;
@@ -170,7 +170,7 @@ app.get('/shop', (req, res) => {
 
 
 // Route untuk menampilkan detail produk
-app.get('/product/:id', (req, res) => {
+app.get('/product/:id', isAuthenticated,(req, res) => {
     const productId = req.params.id;
     const sql = 'SELECT * FROM product WHERE id_product = ?';
     
