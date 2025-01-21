@@ -14,6 +14,7 @@ const session = require('express-session');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+  
 app.use(session({
     secret: process.env.SESSION_SECRET, 
     resave: false,
@@ -306,5 +307,15 @@ if (require.main === module) {
         console.log(`Server berjalan di http://localhost:${port}`);
     });
 }
+
+app.get('/', (req, res) => {
+    res.render('index'); // Pastikan ini merender index.ejs
+  });
+  app.use((err, req, res, next) => {
+    console.error('Error:', err.message);
+    res.status(500).send('Internal Server Error');
+  });
+  
+  
 
 module.exports = app; // Ekspor app untuk pengujian

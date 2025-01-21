@@ -5,16 +5,28 @@ const db = require('../database/db'); // Mocking database connection
 jest.mock('../database/db'); // Mocking koneksi database
 
 describe('POST /order', () => {
-  it('should insert order data into the database and redirect to the homepage', async () => {
-    // Mock data yang akan dikirimkan
-    const mockOrderData = {
+  let mockOrderData;
+
+  // Mock data login user
+  const mockUser = { id: 1, username: 'testuser', isLoggedIn: true };
+
+  beforeAll(() => {
+    // Mocking otentikasi: Simulasikan login sebelum pengujian dimulai
+    app.use((req, res, next) => {
+      req.user = mockUser; // Simulasikan session yang sudah login
+      next();
+    });
+
+    mockOrderData = {
       id_product: 1,
       color: 'red',
       size: 'M',
       quantity: 2,
       address: '123 Main Street',
     };
+  });
 
+  it('should insert order data into the database and redirect to the homepage', async () => {
     // Mock hasil dari database query
     db.query.mockImplementation((sql, params, callback) => {
       callback(null, { affectedRows: 1 }); // Simulasi sukses query
@@ -39,14 +51,6 @@ describe('POST /order', () => {
       callback(new Error('Database error'));
     });
 
-    const mockOrderData = {
-      id_product: 1,
-      color: 'red',
-      size: 'M',
-      quantity: 2,
-      address: '123 Main Street',
-    };
-
     const response = await request(app)
       .post('/order')
       .send(mockOrderData);
@@ -58,12 +62,4 @@ describe('POST /order', () => {
 
 afterAll(() => {
     db.end(); // Menutup koneksi database setelah pengujian selesai
-});
-
-beforeAll(() => {
-    jest.spyOn(console, 'log').mockImplementation(() => {}); // Mematikan console.log
-});
-
-afterAll(() => {
-    console.log.mockRestore(); // Mengembalikan console.log seperti semula
 });

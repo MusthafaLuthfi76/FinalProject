@@ -4,24 +4,7 @@ const db = require('../database/db');
 const router = express.Router();
 
 
-const username = 'admin';
-const password = 'admin123';
 
-bcrypt.hash(password, 10, (err, hash) => {
-    if (err) {
-        console.error('Error hashing password:', err);
-        return;
-    }
-
-    const sql = 'INSERT INTO admin (username, password) VALUES (?, ?)';
-    db.query(sql, [username, hash], (err, result) => {
-        if (err) {
-            console.error('Error inserting admin:', err);
-        } else {
-            console.log('Admin berhasil ditambahkan');
-        }
-    });
-});
 // Route Signup
 router.post('/signup', (req, res) => {
     const { username, password } = req.body;
