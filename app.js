@@ -326,7 +326,21 @@ app.get('/', (req, res) => {
     console.error('Error:', err.message);
     res.status(500).send('Internal Server Error');
   });
-  
-  
+
+  app.post('/order', isAuthenticated, (req, res) => {
+    const { id_product, color, size, quantity, address } = req.body;
+
+    const sql = `INSERT INTO orders (id_product, color, size, quantity, address) VALUES (?, ?, ?, ?, ?)`;
+    db.query(sql, [id_product, color, size, quantity, address], (err, result) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ success: false, message: 'Database error' }); // Pastikan 500 error dikembalikan
+        }
+
+        console.log('Pesanan berhasil masuk ke database');
+        res.redirect('/'); // Redirect ke homepage setelah sukses
+    });
+});
+
 
 module.exports = app; // Ekspor app untuk pengujian
