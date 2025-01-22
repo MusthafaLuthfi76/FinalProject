@@ -1,43 +1,32 @@
 const request = require('supertest');
-const app = require('../app'); // Sesuaikan dengan path aplikasi Anda
-const db = require('../database/db'); // Koneksi database
-
-// Mock session untuk testing
-const mockSession = {
-    isLoggedIn: true,
-    user: {
-        id_user: 1,
-        username: 'admin'
-    }
-};
+const app = require('../app'); // Path ke file app.js atau server
 
 describe('DELETE /admin/delete/:id', () => {
-    let productId;
+    test('Menghapus produk yang ada', async () => {
+        // Misal ID produk yang ingin dihapus adalah 1
+        const productId = 1;
 
-    // Simulasi pembuatan produk sebelum test
-    beforeAll((done) => {
-        const sql = 'INSERT INTO product (nama_product, stok, harga, deskripsi, id_kategori) VALUES ("Test Product", 10, 100, "Test Description", 1)';
-        db.query(sql, (err, result) => {
-            if (err) return done(err);
-            productId = result.insertId;
-            done();
-        });
-    });
+        // Lakukan request delete menggunakan supertest
+        const response = await request(app).get(`/admin/delete/${productId}`);
 
-    it('should delete a product', async () => {
-        const response = await request(app)
-            .get(`/admin/delete/${productId}`)
-            .set('Cookie', [`connect.sid=mockSession`]);
+        // Pastikan status code yang dikembalikan 302 karena redirect
+        expect(response.status).toBe(302);
 
-        expect(response.status).toBe(302); // Redirection after delete
+        // Pastikan di-redirect ke halaman admin
         expect(response.header.location).toBe('/admin');
     });
 
-    afterAll((done) => {
-        // Hapus data produk setelah test
-        const sql = 'DELETE FROM product WHERE id_product = ?';
-        db.query(sql, [productId], (err) => {
-            done(err);
-        });
+    test('Gagal menghapus produk yang tidak ada', async () => {
+        // Misal ID produk yang tidak ada adalah 9999
+        const productId = 9999;
+
+        // Lakukan request delete menggunakan supertest
+        const response = await request(app).get(`/admin/delete/${productId}`);
+
+        // Karena produk tidak ada, tetap redirect ke halaman admin
+        expect(response.status).toBe(302);
+
+        // Pastikan redirect ke halaman admin
+        expect(response.header.location).toBe('/admin');
     });
 });

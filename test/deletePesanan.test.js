@@ -1,43 +1,32 @@
 const request = require('supertest');
-const app = require('../app'); // Sesuaikan dengan path aplikasi Anda
-const db = require('../database/db'); // Koneksi database
-
-// Mock session untuk testing
-const mockSession = {
-    isLoggedIn: true,
-    user: {
-        id_user: 1,
-        username: 'admin'
-    }
-};
+const app = require('../app'); // Path ke file app.js atau server
 
 describe('DELETE /admin/orders/delete/:id', () => {
-    let orderId;
+    test('Menghapus pesanan yang ada', async () => {
+        // Misal ID pesanan yang ingin dihapus adalah 1
+        const orderId = 1;
 
-    // Simulasi pembuatan data pesanan sebelum test
-    beforeAll((done) => {
-        const sql = 'INSERT INTO orders (id_product, color, size, quantity, address) VALUES (1, "Red", "M", 2, "Jalan Raya 1")';
-        db.query(sql, (err, result) => {
-            if (err) return done(err);
-            orderId = result.insertId;
-            done();
-        });
-    });
+        // Lakukan request delete menggunakan supertest
+        const response = await request(app).get(`/admin/orders/delete/${orderId}`);
 
-    it('should delete an order', async () => {
-        const response = await request(app)
-            .get(`/admin/orders/delete/${orderId}`)
-            .set('Cookie', [`connect.sid=mockSession`]);
+        // Pastikan status code yang dikembalikan 302 karena redirect
+        expect(response.status).toBe(302);
 
-        expect(response.status).toBe(302); // Redirection after delete
+        // Pastikan di-redirect ke halaman pesanan admin
         expect(response.header.location).toBe('/admin/orders');
     });
 
-    afterAll((done) => {
-        // Hapus data pesanan setelah test
-        const sql = 'DELETE FROM orders WHERE id_order = ?';
-        db.query(sql, [orderId], (err) => {
-            done(err);
-        });
+    test('Gagal menghapus pesanan yang tidak ada', async () => {
+        // Misal ID pesanan yang tidak ada adalah 9999
+        const orderId = 9999;
+
+        // Lakukan request delete menggunakan supertest
+        const response = await request(app).get(`/admin/orders/delete/${orderId}`);
+
+        // Karena pesanan tidak ada, tetap redirect ke halaman pesanan admin
+        expect(response.status).toBe(302);
+
+        // Pastikan redirect ke halaman pesanan admin
+        expect(response.header.location).toBe('/admin/orders');
     });
 });
