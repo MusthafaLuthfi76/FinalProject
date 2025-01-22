@@ -226,27 +226,83 @@ app.post('/admin/insert', upload.single('gambar'), (req, res) => {
     });
 });
 
-// GET - Render edit product form
+// Route untuk menampilkan halaman edit produk
 app.get('/admin/edit/:id', (req, res) => {
-    let sql = 'SELECT * FROM product WHERE id_product = ?';
-    db.query(sql, [req.params.id], (err, result) => {
-        if (err) throw err;
-        res.render('edit', { product: result[0] });
+    const id = req.params.id;
+    db.query('SELECT * FROM product WHERE id_product = ?', [id], (err, results) => {
+      if (err) {
+        console.error("Error fetching product:", err);
+        res.status(500).send("Internal Server Error");
+        return;
+      }
+  
+      if (results.length === 0) {
+        res.status(404).send("Produk tidak ditemukan");
+        return;
+      }
+  
+      const product = results[0];
+      res.render('edit', { product });
     });
-});
-
-// POST - Update produk
-app.post('/admin/edit/:id', upload.single('gambar'), (req, res) => {
-    const { nama_product, stok, harga, deskripsi, id_kategori } = req.body;
-    const gambar = req.file ? `/uploads/${req.file.filename}` : req.body.old_gambar;
-
-    const sql =
-        'UPDATE product SET nama_product = ?, gambar = ?, stok = ?, harga = ?, deskripsi = ?, id_kategori = ? WHERE id_product = ?';
-    db.query(sql, [nama_product, gambar, stok, harga, deskripsi, id_kategori, req.params.id], (err, result) => {
-        if (err) throw err;
-        res.redirect('/admin');
+  });
+  
+  // Route untuk mengedit produk
+  app.post('/admin/edit/:id', (req, res) => {
+    const id = req.params.id;
+    const { nama_product, gambar, stok, harga, deskripsi, id_kategori } = req.body;
+    
+    // Validasi input
+    if (!nama_product || !stok || !harga || !deskripsi || !id_kategori) {
+      return res.status(400).send("Semua kolom harus diisi.");
+    }
+  
+    // Update produk di database
+    db.query('UPDATE product SET nama_product = ?, gambar = ?, stok = ?, harga = ?, deskripsi = ?, id_kategori = ? WHERE id_product = ?',
+      [nama_product, gambar, stok, harga, deskripsi, id_kategori, id], (err, results) => {
+        if (err) {
+          console.error("Error updating product:", err);
+          res.status(500).send("Terjadi kesalahan saat memperbarui produk.");
+          return;
+        }
+  
+        res.redirect('/admin/products');
+      });
+  });
+  
+  // Route untuk menampilkan daftar produk
+  app.get('/admin/products', (req, res) => {
+    db.query('SELECT * FROM product', (err, results) => {
+      if (err) {
+        console.error("Error fetching products:", err);
+        res.status(500).send("Internal Server Error");
+        return;
+      }
+      res.render('products', { products: results });
     });
-});
+  });
+  
+
+// // GET - Render edit product form
+// app.get('/admin/edit/:id', (req, res) => {
+//     let sql = 'SELECT * FROM product WHERE id_product = ?';
+//     db.query(sql, [req.params.id], (err, result) => {
+//         if (err) throw err;
+//         res.render('edit', { product: result[0] });
+//     });
+// });
+
+// // POST - Update produk
+// app.post('/admin/edit/:id', upload.single('gambar'), (req, res) => {
+//     const { nama_product, stok, harga, deskripsi, id_kategori } = req.body;
+//     const gambar = req.file ? `/uploads/${req.file.filename}` : req.body.old_gambar;
+
+//     const sql =
+//         'UPDATE product SET nama_product = ?, gambar = ?, stok = ?, harga = ?, deskripsi = ?, id_kategori = ? WHERE id_product = ?';
+//     db.query(sql, [nama_product, gambar, stok, harga, deskripsi, id_kategori, req.params.id], (err, result) => {
+//         if (err) throw err;
+//         res.redirect('/admin');
+//     });
+// });
 
 // GET - Delete product
 app.get('/admin/delete/:id', (req, res) => {

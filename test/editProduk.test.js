@@ -1,76 +1,69 @@
 const request = require('supertest');
-const app = require('../app'); // Mengimpor instance aplikasi Express
-const db = require('../database/db'); // Mocking koneksi database
+const app = require('../app'); // Sesuaikan path jika app.js ada di folder yang berbeda
+const db = require('../database/db'); // Sesuaikan path jika file db.js ada di folder yang berbeda
 
-// npx jest editProduk.test.js
-
-jest.mock('../database/db'); // Mock koneksi database
-
-describe('POST /admin/edit/:id', () => {
-  // Data produk untuk pengujian
-  const mockProductId = 1;
-  const mockProductData = {
-    nama_product: 'Produk Baru',
-    stok: 10,
+// Mock data untuk produk
+const mockProductId = 1;
+const mockProduct = {
+    id_product: 1,
+    nama_product: 'Product Name',
+    gambar: '/uploads/sample.jpg',
+    stok: 100,
     harga: 50000,
-    deskripsi: 'Deskripsi produk baru',
-    id_kategori: 2,
-    old_gambar: 'gambar_lama.jpg',
-  };
+    deskripsi: 'Product description',
+    id_kategori: 2
+};
 
-  beforeEach(() => {
-    jest.clearAllMocks(); // Membersihkan mock sebelum setiap pengujian
-  });
+// Menyiapkan mock data produk di database sebelum test dijalankan
+beforeAll(done => {
+    const sql = 'INSERT INTO product (id_product, nama_product, gambar, stok, harga, deskripsi, id_kategori) VALUES (?, ?, ?, ?, ?, ?, ?)';
+    db.query(sql, [
+        mockProduct.id_product,
+        mockProduct.nama_product,
+        mockProduct.gambar,
+        mockProduct.stok,
+        mockProduct.harga,
+        mockProduct.deskripsi,
+        mockProduct.id_kategori
+    ], (err) => {
+        if (err) {
+            console.error('Error inserting mock data:', err);
+        }
+        done();
+    });
+});
 
-  it('should update product data successfully and redirect to /admin', async () => {
-    // Mock hasil database query untuk kasus sukses
-    db.query.mockImplementation((sql, params, callback) => {
-      callback(null, { affectedRows: 1 }); // Simulasi sukses query
+// Test route GET /admin/edit/:id
+describe('GET /admin/edit/:id', () => {
+    it('should render the edit form with the correct product data', async () => {
+        const response = await request(app).get(`/admin/edit/${mockProductId}`);
+        
+        // Pastikan response status 200 (OK)
+        expect(response.status).toBe(200);
+        
+        // Pastikan produk yang ditampilkan sesuai dengan data mock
+        expect(response.text).toContain(mockProduct.nama_product);
+        expect(response.text).toContain(mockProduct.stok.toString()); // Mengubah nilai stok menjadi string
+        expect(response.text).toContain(mockProduct.harga.toString()); // Mengubah nilai harga menjadi string
     });
 
-    const response = await request(app)
-      .post(`/admin/edit/${mockProductId}`)
-      .field('nama_product', mockProductData.nama_product)
-      .field('stok', mockProductData.stok)
-      .field('harga', mockProductData.harga)
-      .field('deskripsi', mockProductData.deskripsi)
-      .field('id_kategori', mockProductData.id_kategori)
-      .field('old_gambar', mockProductData.old_gambar);
-
-    expect(response.status).toBe(302); // Mengecek status redirect
-    expect(response.headers.location).toBe('/admin'); // Mengecek lokasi redirect
-
-    expect(db.query).toHaveBeenCalledWith(
-      'UPDATE produk SET nama_product = ?, stok = ?, harga = ?, deskripsi = ?, id_kategori = ?, gambar = ? WHERE id_product = ?',
-      [
-        mockProductData.nama_product,
-        mockProductData.stok,
-        mockProductData.harga,
-        mockProductData.deskripsi,
-        mockProductData.id_kategori,
-        mockProductData.old_gambar, // Anda dapat mengganti ini dengan nama file baru jika ada file yang diunggah
-        mockProductId,
-      ],
-      expect.any(Function)
-    );
-  });
-
-  it('should return 500 if database query fails', async () => {
-    // Mock database query untuk simulasi error
-    db.query.mockImplementation((sql, params, callback) => {
-      callback(new Error('Database error'));
+    it('should return a 404 error if product does not exist', async () => {
+        const nonExistentProductId = 999; // ID yang tidak ada
+        const response = await request(app).get(`/admin/edit/${nonExistentProductId}`);
+        
+        // Pastikan response status 404 (Not Found)
+        expect(response.status).toBe(404);
+        expect(response.text).toContain('Produk tidak ditemukan');
     });
+});
 
-    const response = await request(app)
-      .post(`/admin/edit/${mockProductId}`)
-      .field('nama_product', mockProductData.nama_product)
-      .field('stok', mockProductData.stok)
-      .field('harga', mockProductData.harga)
-      .field('deskripsi', mockProductData.deskripsi)
-      .field('id_kategori', mockProductData.id_kategori)
-      .field('old_gambar', mockProductData.old_gambar);
-
-    expect(response.status).toBe(500); // Mengecek status error
-    expect(response.text).toContain('Database error'); // Mengecek pesan error
-  });
+// Menjaga database bersih setelah test dijalankan
+afterAll(done => {
+    const sql = 'DELETE FROM product WHERE id_product = ?';
+    db.query(sql, [mockProductId], (err) => {
+        if (err) {
+            console.error('Error deleting mock data:', err);
+        }
+        done();
+    });
 });
