@@ -207,10 +207,21 @@ app.post('/admin/insert', upload.single('gambar'), (req, res) => {
     const { nama_product, stok, harga, deskripsi, id_kategori } = req.body;
     const gambar = req.file ? `/uploads/${req.file.filename}` : null;
 
+    // Validasi: pastikan semua field yang dibutuhkan ada
+    if (!nama_product || !stok || !harga || !deskripsi || !id_kategori || !gambar) {
+        return res.status(400).json({ message: 'Field wajib harus diisi' });
+    }
+
     const sql =
         'INSERT INTO product (nama_product, gambar, stok, harga, deskripsi, id_kategori) VALUES (?, ?, ?, ?, ?, ?)';
+    
     db.query(sql, [nama_product, gambar, stok, harga, deskripsi, id_kategori], (err, result) => {
-        if (err) throw err;
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Terjadi kesalahan saat menyimpan produk' });
+        }
+
+        // Redirect ke halaman admin setelah berhasil insert produk
         res.redirect('/admin');
     });
 });
