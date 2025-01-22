@@ -14,6 +14,7 @@ const session = require('express-session');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+  
 app.use(session({
     secret: process.env.SESSION_SECRET, 
     resave: false,
@@ -206,10 +207,21 @@ app.post('/admin/insert', upload.single('gambar'), (req, res) => {
     const { nama_product, stok, harga, deskripsi, id_kategori } = req.body;
     const gambar = req.file ? `/uploads/${req.file.filename}` : null;
 
+    // Validasi: pastikan semua field yang dibutuhkan ada
+    if (!nama_product || !stok || !harga || !deskripsi || !id_kategori || !gambar) {
+        return res.status(400).json({ message: 'Field wajib harus diisi' });
+    }
+
     const sql =
         'INSERT INTO product (nama_product, gambar, stok, harga, deskripsi, id_kategori) VALUES (?, ?, ?, ?, ?, ?)';
+    
     db.query(sql, [nama_product, gambar, stok, harga, deskripsi, id_kategori], (err, result) => {
-        if (err) throw err;
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Terjadi kesalahan saat menyimpan produk' });
+        }
+
+        // Redirect ke halaman admin setelah berhasil insert produk
         res.redirect('/admin');
     });
 });
@@ -306,5 +318,29 @@ if (require.main === module) {
         console.log(`Server berjalan di http://localhost:${port}`);
     });
 }
+
+app.get('/', (req, res) => {
+    res.render('index'); // Pastikan ini merender index.ejs
+  });
+  app.use((err, req, res, next) => {
+    console.error('Error:', err.message);
+    res.status(500).send('Internal Server Error');
+  });
+
+  app.post('/order', isAuthenticated, (req, res) => {
+    const { id_product, color, size, quantity, address } = req.body;
+
+    const sql = `INSERT INTO orders (id_product, color, size, quantity, address) VALUES (?, ?, ?, ?, ?)`;
+    db.query(sql, [id_product, color, size, quantity, address], (err, result) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ success: false, message: 'Database error' }); // Pastikan 500 error dikembalikan
+        }
+
+        console.log('Pesanan berhasil masuk ke database');
+        res.redirect('/'); // Redirect ke homepage setelah sukses
+    });
+});
+
 
 module.exports = app; // Ekspor app untuk pengujian
