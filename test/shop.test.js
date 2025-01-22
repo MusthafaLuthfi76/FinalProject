@@ -1,8 +1,9 @@
 const request = require('supertest');
-const app = require('../app'); // Pastikan app.js adalah file server Express Anda
+const app = require('../app'); // Pastikan ini adalah file server Express Anda
 
-describe('GET / (Home Page)', () => {
-  it('should render the index.ejs with Shop link', async () => {
-    const response = await request(app).get('/').expect(200);
+describe('GET /shop (Shop Page)', () => {
+  it('should render the shop page', async () => {
+    const response = await request(app).get('/shop').expect(200);
+    expect(response.text).toContain('Shop'); // Sesuaikan dengan konten di halaman Testimonial
   });
 });
